@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Landing from "./pages/Landing";
+import Landing from  "./pages/Landing";
 import ConnectBanks from "./pages/ConnectBanks";
 import Dashboard from "./pages/Dashboard";
 
@@ -9,7 +9,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/connect" element={<ConnectBanks />} />
+        <Route path="/connect-banks" element={<ConnectBanks />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
@@ -17,5 +17,3 @@ function App() {
 }
 
 export default App;
-
-
