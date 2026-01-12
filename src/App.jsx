@@ -1,19 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import Landing from  "./pages/Landing";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing";
 import ConnectBanks from "./pages/ConnectBanks";
 import Dashboard from "./pages/Dashboard";
 
-function App() {
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/connect-banks" element={<ConnectBanks />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      {/* Global wrapper: keeps content centered */}
+      <div className="min-h-screen">
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/connect" element={<ConnectBanks />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
-
-export default App;

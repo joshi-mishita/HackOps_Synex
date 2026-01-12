@@ -1,65 +1,106 @@
-import "./ConnectBanks.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ConnectBanks() {
+export default function ConnectBanks() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
-  const banks = ["Bank of India", "HDFC Bank", "SBI"];
+  const allBanks = ["HDFC Bank", "ICICI Bank"];
+  const [selectedBanks, setSelectedBanks] = useState([]);
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
 
-  const handleConsent = () => {
-    setLoading(true);
+  const toggleBank = (bank) => {
+    setSelectedBanks((prev) =>
+      prev.includes(bank) ? prev.filter((b) => b !== bank) : [...prev, bank]
+    );
+  };
 
-    // Fake AA consent processing
+  const grantConsent = () => {
+    setStatus("loading");
+
     setTimeout(() => {
-      navigate("/dashboard");
-    }, 2000);
+      const ok = Math.random() > 0.2;
+      setStatus(ok ? "success" : "error");
+
+      if (ok) setTimeout(() => navigate("/dashboard"), 800);
+    }, 1600);
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex justify-center">
-      <div className="w-full max-w-md px-4 md:px-0 flex items-center">
-        <div className="w-full bg-slate-800 rounded-xl p-6 shadow-xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-2">
-            Connect Your Bank Accounts
-          </h2>
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <h1 className="text-3xl font-bold text-sky-50">Connect Banks</h1>
 
-          <p className="text-slate-300 text-center mb-6 text-sm">
-            Securely link your accounts via RBI-regulated Account Aggregator
+      <p className="mt-2 text-sky-200">
+        Select banks and grant consent to securely fetch account information.
+      </p>
+
+      {/* Bank selection */}
+      <div className="mt-8 grid md:grid-cols-2 gap-4">
+        {allBanks.map((bank) => {
+          const active = selectedBanks.includes(bank);
+
+          return (
+            <button
+              key={bank}
+              onClick={() => toggleBank(bank)}
+              className={`p-5 rounded-2xl border text-left transition duration-200 ${
+                active
+                  ? "bg-sky-400/20 text-sky-50 border-sky-300/30"
+                  : "bg-white/5 text-sky-100 border-white/10 hover:border-white/25"
+              }`}
+            >
+              <p className="text-lg font-semibold">{bank}</p>
+              <p className={`text-sm ${active ? "text-sky-200" : "text-sky-300"}`}>
+                {active ? "Selected ✅" : "Tap to select"}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Consent Button */}
+      <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
+        <button
+          disabled={selectedBanks.length === 0 || status === "loading"}
+          onClick={grantConsent}
+          className="px-5 py-3 rounded-xl bg-sky-300 text-slate-900 font-semibold hover:bg-sky-200 transition disabled:opacity-40"
+        >
+          Grant Consent
+        </button>
+
+        {status === "idle" && (
+          <p className="text-sm text-sky-300">
+            Choose at least one bank to continue.
           </p>
+        )}
 
-          <div className="space-y-4">
-            {banks.map((bank) => (
-              <div
-                key={bank}
-                className="flex justify-between items-center bg-slate-700 px-4 py-3 rounded-lg"
-              >
-                <span className="text-white">{bank}</span>
-                <span className="text-xs text-slate-300">
-                  Available
-                </span>
-              </div>
-            ))}
-          </div>
+        {status === "loading" && (
+          <p className="text-sm text-sky-200 font-medium">
+            Granting consent… ⏳
+          </p>
+        )}
 
-          <button
-            onClick={handleConsent}
-            disabled={loading}
-            className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-60"
-          >
-            {loading ? "Granting Consent..." : "Grant Consent"}
-          </button>
+        {status === "success" && (
+          <p className="text-sm text-green-300 font-semibold">
+            Consent approved ✅ Redirecting…
+          </p>
+        )}
 
-          {loading && (
-            <p className="text-center text-slate-400 text-sm mt-4">
-              Connecting securely via Account Aggregator…
-            </p>
-          )}
-        </div>
+        {status === "error" && (
+          <p className="text-sm text-red-300 font-semibold">
+            Consent failed ❌ Try again.
+          </p>
+        )}
+      </div>
+
+      {/* Back */}
+      <div className="mt-10">
+        <button
+          onClick={() => navigate("/")}
+          className="text-sm font-semibold text-sky-200 hover:text-sky-100 underline"
+        >
+          ← Back to Home
+        </button>
       </div>
     </div>
   );
 }
-
-export default ConnectBanks;

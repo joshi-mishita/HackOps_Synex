@@ -1,15 +1,30 @@
+:root {
+  /* Background */
+  --bg: #0B1C2D;
+
+  /* Text palette (Ice Blue theme) */
+  --text-main: #E0F2FE;       /* Main text */
+  --text-secondary: #BAE6FD;  /* Secondary text */
+  --text-muted: #7DD3FC;      /* Muted / labels */
+
+  /* Accent */
+  --accent: #7DD3FC;
+  --accent-hover: #BAE6FD;
+}
+
 body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
-  background-color: #0B1C2D; /* Navy background */
-  color: #F5F1EA;           /* Beige text */
+  background-color: var(--bg);
+  color: var(--text-main);
 }
 
+/* Subtext defaults */
+p {
+  color: var(--text-secondary);
+}
+
+/* Basic button reset (DON'T override Tailwind buttons) */
 button {
-  background: #F5F1EA;      /* Beige button */
-  color: #0B1C2D;           /* Navy text */
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
+  font-family: inherit;
 }
