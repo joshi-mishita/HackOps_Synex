@@ -27,7 +27,7 @@ export default function ConnectBanks() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 relative">
-      {/* ✅ Back to Home moved to TOP CORNER */}
+      {/* Back to Home moved to TOP CORNER */}
       <button
         onClick={() => navigate("/")}
         className="absolute top-4 left-4 text-sm font-semibold text-sky-200 hover:text-sky-100 underline"

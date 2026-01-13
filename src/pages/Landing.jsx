@@ -6,7 +6,7 @@ export default function Landing() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-14">
-      {/* ✅ Logo at top */}
+      {/* Logo at top */}
       <div className="flex justify-center md:justify-start mb-10">
         <img
           src={logo}
@@ -15,7 +15,7 @@ export default function Landing() {
         />
       </div>
 
-      {/* ✅ Layout changed: left content on TOP, right card below */}
+      {/* Layout changed: left content on TOP, right card below */}
       <div className="flex flex-col gap-10">
         {/* TOP SECTION */}
         <div>
