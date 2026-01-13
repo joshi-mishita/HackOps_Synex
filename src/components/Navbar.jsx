@@ -1,8 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { isLoggedIn, logout } from "../utils/auth";
-import ThemeToggle from "./ThemeToggle";
 
-// ✅ add this import (make sure file name matches)
+// add this import (make sure file name matches)
 import logo from "../assets/Synex_Logo.jpeg";
 
 export default function Navbar() {
@@ -24,7 +23,7 @@ export default function Navbar() {
     <nav className="w-full border-b border-white/10 bg-[var(--bg)]/80 backdrop-blur sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
-        {/* ✅ LOGO + BRAND */}
+        {/* LOGO + BRAND */}
         <Link to="/" className="flex items-center gap-3">
           <img
             src={logo}
@@ -37,7 +36,6 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-3">
-          <ThemeToggle />
 
           <Link
             to="/"
