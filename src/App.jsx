@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import ConnectBanks from "./pages/ConnectBanks";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 
 export default function App() {
   return (
@@ -31,6 +32,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
