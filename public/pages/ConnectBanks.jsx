@@ -1,107 +1,241 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function ConnectBanks() {
   const navigate = useNavigate();
+  const otpRefs = useRef([]);
+  const startTimeRef = useRef(null);
 
-  const allBanks = ["HDFC Bank", "ICICI Bank"];
-  const [selectedBanks, setSelectedBanks] = useState([]);
-  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  /* ---------------- BANK DATA ---------------- */
 
-  const toggleBank = (bank) => {
-    setSelectedBanks((prev) =>
-      prev.includes(bank) ? prev.filter((b) => b !== bank) : [...prev, bank]
+  const banks = [
+    { id: "hdfc", name: "HDFC Bank" },
+    { id: "icici", name: "ICICI Bank" },
+    { id: "sbi", name: "State Bank of India" }
+  ];
+
+  const bankConsentText = {
+    hdfc: "HDFC will share last 12 months of transactions (read-only).",
+    icici: "ICICI will share balances and statements.",
+    sbi: "SBI requires additional verification."
+  };
+
+  /* ---------------- STATE ---------------- */
+
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [status, setStatus] = useState("idle");
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(30);
+  const [attempts, setAttempts] = useState(0);
+  const [latency, setLatency] = useState(null);
+  const [consentId, setConsentId] = useState(null);
+  const [expirySeconds, setExpirySeconds] = useState(30 * 24 * 60 * 60);
+
+  /* ---------------- UTILITIES ---------------- */
+
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+  function generateConsentId() {
+    return (
+      "AA-" +
+      selectedBank?.toUpperCase() +
+      "-" +
+      Math.random().toString(36).substring(2, 8).toUpperCase()
     );
-  };
+  }
 
-  const grantConsent = () => {
-    setStatus("loading");
+  function downloadReceipt() {
+    const data = {
+      consentId,
+      bank: selectedBank,
+      issuedAt: new Date().toISOString(),
+      expiresInSeconds: expirySeconds,
+      latency
+    };
 
-    setTimeout(() => {
-      const ok = Math.random() > 0.2;
-      setStatus(ok ? "success" : "error");
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "consent-receipt.json";
+    a.click();
+  }
 
-      if (ok) setTimeout(() => navigate("/dashboard"), 800);
-    }, 1600);
-  };
+  /* ---------------- TIMERS ---------------- */
+
+  useEffect(() => {
+    if (status === "otp" && timer > 0) {
+      const i = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(i);
+    }
+  }, [status, timer]);
+
+  useEffect(() => {
+    if (status === "success" && expirySeconds > 0) {
+      const i = setInterval(() => setExpirySeconds((e) => e - 1), 1000);
+      return () => clearInterval(i);
+    }
+  }, [status, expirySeconds]);
+
+  /* ---------------- FLOW HANDLERS ---------------- */
+
+  async function handleConsent() {
+    setStatus("redirect");
+    startTimeRef.current = performance.now();
+    await delay(1500);
+
+    setConsentId(generateConsentId());
+    setStatus("otp");
+    setOtp("");
+    setTimer(30);
+    setAttempts(0);
+
+    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+  }
+
+  async function handleVerifyOTP() {
+    if (attempts >= 2) {
+      setStatus("locked");
+      return;
+    }
+
+    setStatus("verifying");
+    await delay(1200);
+
+    if (otp === "123456") {
+      const end = performance.now();
+      setLatency(((end - startTimeRef.current) / 1000).toFixed(2));
+      setStatus("success");
+      setTimeout(() => navigate("/dashboard"), 4000);
+    } else {
+      setAttempts((a) => a + 1);
+      setStatus("otp");
+    }
+  }
+
+  function handleOtpChange(val, i) {
+    if (!/^[0-9]?$/.test(val)) return;
+    const arr = otp.split("");
+    arr[i] = val;
+    setOtp(arr.join(""));
+    if (val && i < 5) otpRefs.current[i + 1]?.focus();
+  }
+
+  /* ---------------- UI ---------------- */
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 relative">
-      {/* Back to Home moved to TOP CORNER */}
-      <button
-        onClick={() => navigate("/")}
-        className="absolute top-4 left-4 text-sm font-semibold text-sky-200 hover:text-sky-100 underline"
-      >
-        ← Back to Home
-      </button>
+    <div style={{ padding: 30, fontFamily: "Arial" }}>
+      {/* DEMO BANNER */}
+      <div style={{ background: "#eef2ff", padding: 10, borderRadius: 8 }}>
+        🧪 Demo Mode — No real bank data is used
+      </div>
 
-      {/* Page content */}
-      <div className="pt-8">
-        <h1 className="text-3xl font-bold text-sky-50">Connect Banks</h1>
+      <h1 style={{ marginTop: 20 }}>Account Aggregator Consent</h1>
 
-        <p className="mt-2 text-sky-200">
-          Select banks and grant consent to securely fetch account information.
-        </p>
-
-        {/* Bank selection */}
-        <div className="mt-8 grid md:grid-cols-2 gap-4">
-          {allBanks.map((bank) => {
-            const active = selectedBanks.includes(bank);
-
-            return (
-              <button
-                key={bank}
-                onClick={() => toggleBank(bank)}
-                className={`p-5 rounded-2xl border text-left transition duration-200 ${
-                  active
-                    ? "bg-sky-400/20 text-sky-50 border-sky-300/30"
-                    : "bg-white/5 text-sky-100 border-white/10 hover:border-white/25"
-                }`}
-              >
-                <p className="text-lg font-semibold">{bank}</p>
-                <p className={`text-sm ${active ? "text-sky-200" : "text-sky-300"}`}>
-                  {active ? "Selected ✅" : "Tap to select"}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Consent Button */}
-        <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
-          <button
-            disabled={selectedBanks.length === 0 || status === "loading"}
-            onClick={grantConsent}
-            className="px-7 py-4 rounded-2xl bg-sky-300 text-slate-900 font-semibold hover:bg-sky-200 transition disabled:opacity-40"
+      {/* BANK SELECTION */}
+      <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
+        {banks.map((b) => (
+          <div
+            key={b.id}
+            onClick={() => setSelectedBank(b.id)}
+            style={{
+              border:
+                selectedBank === b.id
+                  ? "2px solid #4f46e5"
+                  : "1px solid #ccc",
+              padding: 16,
+              borderRadius: 12,
+              cursor: "pointer",
+              width: 180
+            }}
           >
-            Grant Consent
-          </button>
+            <h3>{b.name}</h3>
+          </div>
+        ))}
+      </div>
+
+      {/* CONSENT INFO */}
+      {selectedBank && (
+        <div style={{ marginTop: 20 }}>
+          <p><b>{bankConsentText[selectedBank]}</b></p>
+          <p>🔒 Low Risk · Read-only Access</p>
 
           {status === "idle" && (
-            <p className="text-sm text-sky-300">
-              Choose at least one bank to continue.
-            </p>
-          )}
-
-          {status === "loading" && (
-            <p className="text-sm text-sky-200 font-medium">
-              Granting consent… ⏳
-            </p>
-          )}
-
-          {status === "success" && (
-            <p className="text-sm text-green-300 font-semibold">
-              Consent approved ✅ Redirecting…
-            </p>
-          )}
-
-          {status === "error" && (
-            <p className="text-sm text-red-300 font-semibold">
-              Consent failed ❌ Try again.
-            </p>
+            <button onClick={handleConsent}>
+              Grant Consent
+            </button>
           )}
         </div>
-      </div>
+      )}
+
+      {status === "redirect" && (
+        <p>Redirecting to {selectedBank?.toUpperCase()} secure gateway…</p>
+      )}
+
+      {/* OTP */}
+      {status === "otp" && (
+        <div style={{ marginTop: 20 }}>
+          <h3>Verify OTP</h3>
+
+          <div style={{ display: "flex", gap: 8 }}>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <input
+                key={i}
+                ref={(el) => (otpRefs.current[i] = el)}
+                maxLength="1"
+                value={otp[i] || ""}
+                onChange={(e) =>
+                  handleOtpChange(e.target.value, i)
+                }
+                style={{
+                  width: 40,
+                  height: 50,
+                  textAlign: "center"
+                }}
+              />
+            ))}
+          </div>
+
+          <button onClick={handleVerifyOTP} style={{ marginTop: 10 }}>
+            Verify OTP
+          </button>
+
+          <p style={{ fontSize: 12 }}>
+            {timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}
+          </p>
+
+          <p style={{ fontSize: 12 }}>
+            Demo OTP: <b>123456</b>
+          </p>
+        </div>
+      )}
+
+      {status === "locked" && (
+        <p style={{ color: "red" }}>
+          Too many failed attempts. Please retry later.
+        </p>
+      )}
+
+      {status === "verifying" && <p>Verifying OTP…</p>}
+
+      {/* SUCCESS */}
+      {status === "success" && (
+        <div style={{ marginTop: 30, background: "#ecfdf5", padding: 20 }}>
+          <h2>✅ Consent Granted</h2>
+          <p><b>Consent ID:</b> {consentId}</p>
+          <p><b>Latency:</b> {latency}s</p>
+          <p>
+            <b>Expires in:</b>{" "}
+            {Math.floor(expirySeconds / 3600)} hours
+          </p>
+
+          <button onClick={downloadReceipt}>
+            Download Consent Receipt
+          </button>
+        </div>
+      )}
     </div>
   );
 }
