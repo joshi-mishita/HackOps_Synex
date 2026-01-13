@@ -6,7 +6,7 @@ export default function Landing() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-14">
-      {/* Logo at top */}
+      {/* Logo */}
       <div className="flex justify-center md:justify-start mb-10">
         <img
           src={logo}
@@ -15,9 +15,8 @@ export default function Landing() {
         />
       </div>
 
-      {/* Layout changed: left content on TOP, right card below */}
+      {/* Layout changed: top then bottom */}
       <div className="flex flex-col gap-10">
-        {/* TOP SECTION */}
         <div>
           <p className="inline-block px-3 py-1 rounded-full bg-sky-400/20 border border-sky-300/30 text-sky-100 text-xs font-semibold">
             Unified Bank Dashboard
@@ -33,13 +32,15 @@ export default function Landing() {
           </p>
 
           <div className="mt-8 flex gap-4 flex-wrap">
+            {/* start demo -> login */}
             <button
-              onClick={() => navigate("/connect")}
+              onClick={() => navigate("/login")}
               className="px-7 py-4 rounded-2xl bg-sky-300 text-slate-900 font-semibold hover:bg-sky-200 transition shadow-lg"
             >
               Get Started
             </button>
 
+            {/* demo dashboard protected */}
             <button
               onClick={() => navigate("/dashboard")}
               className="px-7 py-4 rounded-2xl border border-white/20 text-sky-50 font-semibold hover:bg-white/10 transition"
@@ -49,7 +50,6 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* BOTTOM SECTION */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-7 shadow-sm max-w-3xl">
           <h3 className="font-semibold text-xl text-sky-50">
             What you’ll get
