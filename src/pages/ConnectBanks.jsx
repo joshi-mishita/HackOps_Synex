@@ -26,80 +26,81 @@ export default function ConnectBanks() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-sky-50">Connect Banks</h1>
+    <div className="max-w-4xl mx-auto px-4 py-12 relative">
+      {/* ✅ Back to Home moved to TOP CORNER */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 text-sm font-semibold text-sky-200 hover:text-sky-100 underline"
+      >
+        ← Back to Home
+      </button>
 
-      <p className="mt-2 text-sky-200">
-        Select banks and grant consent to securely fetch account information.
-      </p>
+      {/* Page content */}
+      <div className="pt-8">
+        <h1 className="text-3xl font-bold text-sky-50">Connect Banks</h1>
 
-      {/* Bank selection */}
-      <div className="mt-8 grid md:grid-cols-2 gap-4">
-        {allBanks.map((bank) => {
-          const active = selectedBanks.includes(bank);
+        <p className="mt-2 text-sky-200">
+          Select banks and grant consent to securely fetch account information.
+        </p>
 
-          return (
-            <button
-              key={bank}
-              onClick={() => toggleBank(bank)}
-              className={`p-5 rounded-2xl border text-left transition duration-200 ${
-                active
-                  ? "bg-sky-400/20 text-sky-50 border-sky-300/30"
-                  : "bg-white/5 text-sky-100 border-white/10 hover:border-white/25"
-              }`}
-            >
-              <p className="text-lg font-semibold">{bank}</p>
-              <p className={`text-sm ${active ? "text-sky-200" : "text-sky-300"}`}>
-                {active ? "Selected ✅" : "Tap to select"}
-              </p>
-            </button>
-          );
-        })}
-      </div>
+        {/* Bank selection */}
+        <div className="mt-8 grid md:grid-cols-2 gap-4">
+          {allBanks.map((bank) => {
+            const active = selectedBanks.includes(bank);
 
-      {/* Consent Button */}
-      <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
-        <button
-          disabled={selectedBanks.length === 0 || status === "loading"}
-          onClick={grantConsent}
-          className="px-5 py-3 rounded-xl bg-sky-300 text-slate-900 font-semibold hover:bg-sky-200 transition disabled:opacity-40"
-        >
-          Grant Consent
-        </button>
+            return (
+              <button
+                key={bank}
+                onClick={() => toggleBank(bank)}
+                className={`p-5 rounded-2xl border text-left transition duration-200 ${
+                  active
+                    ? "bg-sky-400/20 text-sky-50 border-sky-300/30"
+                    : "bg-white/5 text-sky-100 border-white/10 hover:border-white/25"
+                }`}
+              >
+                <p className="text-lg font-semibold">{bank}</p>
+                <p className={`text-sm ${active ? "text-sky-200" : "text-sky-300"}`}>
+                  {active ? "Selected ✅" : "Tap to select"}
+                </p>
+              </button>
+            );
+          })}
+        </div>
 
-        {status === "idle" && (
-          <p className="text-sm text-sky-300">
-            Choose at least one bank to continue.
-          </p>
-        )}
+        {/* Consent Button */}
+        <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
+          <button
+            disabled={selectedBanks.length === 0 || status === "loading"}
+            onClick={grantConsent}
+            className="px-7 py-4 rounded-2xl bg-sky-300 text-slate-900 font-semibold hover:bg-sky-200 transition disabled:opacity-40"
+          >
+            Grant Consent
+          </button>
 
-        {status === "loading" && (
-          <p className="text-sm text-sky-200 font-medium">
-            Granting consent… ⏳
-          </p>
-        )}
+          {status === "idle" && (
+            <p className="text-sm text-sky-300">
+              Choose at least one bank to continue.
+            </p>
+          )}
 
-        {status === "success" && (
-          <p className="text-sm text-green-300 font-semibold">
-            Consent approved ✅ Redirecting…
-          </p>
-        )}
+          {status === "loading" && (
+            <p className="text-sm text-sky-200 font-medium">
+              Granting consent… ⏳
+            </p>
+          )}
 
-        {status === "error" && (
-          <p className="text-sm text-red-300 font-semibold">
-            Consent failed ❌ Try again.
-          </p>
-        )}
-      </div>
+          {status === "success" && (
+            <p className="text-sm text-green-300 font-semibold">
+              Consent approved ✅ Redirecting…
+            </p>
+          )}
 
-      {/* Back */}
-      <div className="mt-10">
-        <button
-          onClick={() => navigate("/")}
-          className="text-sm font-semibold text-sky-200 hover:text-sky-100 underline"
-        >
-          ← Back to Home
-        </button>
+          {status === "error" && (
+            <p className="text-sm text-red-300 font-semibold">
+              Consent failed ❌ Try again.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
