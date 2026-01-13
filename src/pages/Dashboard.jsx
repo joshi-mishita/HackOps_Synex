@@ -232,9 +232,21 @@ export default function Dashboard() {
           <div className="mt-6 h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={categorySpend} dataKey="value" nameKey="name" outerRadius={90}>
+                <Pie
+                  data={categorySpend}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={90}
+                >
                   {categorySpend.map((_, i) => (
-                    <Cell key={i} />
+                   <Cell
+                     key={i}
+                      fill={
+                        ["#7DD3FC", "#38BDF8", "#A78BFA", "#34D399", "#FBBF24", "#FB7185"][
+                         i % 6
+                        ]
+                      }
+                    />
                   ))}
                 </Pie>
                 <Tooltip {...tooltipStyle} />
@@ -253,7 +265,7 @@ export default function Dashboard() {
                 <XAxis dataKey="name" stroke="#BAE6FD" />
                 <YAxis stroke="#BAE6FD" />
                 <Tooltip {...tooltipStyle} />
-                <Bar dataKey="value" radius={[10, 10, 0, 0]} />
+                <Bar dataKey="value" fill="#7DD3FC" radius={[10, 10, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

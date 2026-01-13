@@ -6,15 +6,6 @@ export default function Landing() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">
-      {/* logo top */}
-      <div className="flex items-center gap-3">
-        <img
-          src={logo}
-          alt="Synex Logo"
-          className="h-12 w-12 rounded-xl shadow"
-        />
-        <span className="text-sky-50 font-bold text-xl">Synex</span>
-      </div>
 
       {/* stacked layout */}
       <div className="mt-12 space-y-10">

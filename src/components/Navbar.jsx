@@ -2,6 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { isLoggedIn, logout } from "../utils/auth";
 import ThemeToggle from "./ThemeToggle";
 
+// ✅ add this import (make sure file name matches)
+import logo from "../assets/Synex_Logo.jpeg";
+
 export default function Navbar() {
   const navigate = useNavigate();
   const loggedIn = isLoggedIn();
@@ -20,8 +23,17 @@ export default function Navbar() {
   return (
     <nav className="w-full border-b border-white/10 bg-[var(--bg)]/80 backdrop-blur sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-sky-50 tracking-wide">
-          Synex
+
+        {/* ✅ LOGO + BRAND */}
+        <Link to="/" className="flex items-center gap-3">
+          <img
+            src={logo}
+            alt="Synex Logo"
+            className="h-10 w-10 rounded-xl shadow"
+          />
+          <span className="text-sky-50 font-bold text-xl tracking-wide">
+            Synex
+          </span>
         </Link>
 
         <div className="flex items-center gap-3">
