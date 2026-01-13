@@ -33,7 +33,6 @@ export default function ConnectBanks() {
         Select banks and grant consent to securely fetch account information.
       </p>
 
-      {/* Bank selection */}
       <div className="mt-8 grid md:grid-cols-2 gap-4">
         {allBanks.map((bank) => {
           const active = selectedBanks.includes(bank);
@@ -57,7 +56,6 @@ export default function ConnectBanks() {
         })}
       </div>
 
-      {/* Consent Button */}
       <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
         <button
           disabled={selectedBanks.length === 0 || status === "loading"}
@@ -92,7 +90,6 @@ export default function ConnectBanks() {
         )}
       </div>
 
-      {/* Back */}
       <div className="mt-10">
         <button
           onClick={() => navigate("/")}
