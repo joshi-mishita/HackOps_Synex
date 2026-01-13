@@ -1,3 +1,8 @@
+## Hackathon Submission (13 Jan 2026)
+
+This repository contains the frontend prototype of Synex — a unified platform to connect multiple bank accounts and view balances, transactions, and spending insights in one place.
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
