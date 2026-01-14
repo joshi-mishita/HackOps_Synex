@@ -1,21 +1,35 @@
-## Hackathon Submission (13 Jan 2026)
+Problem Statement:
+In India, most people use multiple bank accounts across different banks. Currently, there is no single platform where users can view and manage all their bank accounts together.
+This makes it difficult to:
+1)Track total money across banks
+2)Monitor expenses
+3)Manage personal finances easily.
 
-This repository contains the frontend prototype of Synex — a unified platform to connect multiple bank accounts and view balances, transactions, and spending insights in one place.
+Solution:
+This project proposes a single platform that allows users to connect multiple bank accounts and view their financial information in one place.
+The platform uses a centralized backend and APIs to collect and display data from different banking platforms.
 
+Features:
+1)User registration and login
+2)Connect multiple bank accounts (mock data)
+3)View total balance from all accounts
+4)View transaction history
+5)Simple and user-friendly dashboard
 
-# React + Vite
+Technologies Used:
+1)Frontend: React.js
+2)Backend: Node.js, Express.js
+3)Database: MongoDB
+4)Authentication: JWT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is designed for the Indian banking system and can be extended in the future to work with:
+1)Indian banks
+2)UPI-based transactions
+3)Account Aggregator systems
 
-Currently, two official plugins are available:
+Future Scope:
+1)Real bank API integration
+2)Expense categorization
+3)Budget tracking
+4)Mobile application
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
