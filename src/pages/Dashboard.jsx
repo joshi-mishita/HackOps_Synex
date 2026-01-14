@@ -16,7 +16,7 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-// ✅ mapping localStorage ids -> bank display names
+//  mapping localStorage ids -> bank display names
 const BANK_NAME = {
   hdfc: "HDFC Bank",
   icici: "ICICI Bank",
@@ -38,22 +38,22 @@ export default function Dashboard() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
 
-  // =========================
-  // ✅ FETCH DASHBOARD DATA
-  // =========================
+ 
+  //  FETCH DASHBOARD DATA
+ 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         setError("");
 
-        // ✅ connected banks list from localStorage
+        // connected banks list from localStorage
         const connected = JSON.parse(
           localStorage.getItem("synex_connected_banks") || "[]"
         );
         setConnectedBanks(connected);
 
-        // ✅ fetch full dashboard
+        // fetch full dashboard
         const res = await fetch(`${API_URL}/api/dashboard`);
         if (!res.ok) throw new Error("Backend error");
         const data = await res.json();
@@ -63,17 +63,17 @@ export default function Dashboard() {
         const allCats = data.categories || [];
 
         if (connected.length > 0) {
-          // ✅ connected bank names
+          //connected bank names
           const connectedNames = connected
             .map((id) => BANK_NAME[id])
             .filter(Boolean);
 
-          // ✅ filter banks (backend should ideally send id also)
+          // filter banks (backend should ideally send id also)
           const filteredBanks = allBanks.filter((b) =>
             connected.includes(b.id)
           );
 
-          // ✅ filter transactions (txn.bank should be bank display name)
+          // filter transactions (txn.bank should be bank display name)
           const filteredTxns = allTxns.filter((t) =>
             connectedNames.includes(t.bank)
           );
@@ -82,7 +82,7 @@ export default function Dashboard() {
           setTransactions(filteredTxns);
           setCategories(["All", ...allCats]);
         } else {
-          // ✅ no connected -> show everything
+          // no connected -> show everything
           setBanks(allBanks);
           setTransactions(allTxns);
           setCategories(["All", ...allCats]);
@@ -100,9 +100,9 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  // =========================
-  // ✅ TOTALS / SUMMARY
-  // =========================
+  
+  //  TOTALS / SUMMARY
+  
   const totalBalance = useMemo(
     () => banks.reduce((sum, b) => sum + (Number(b.balance) || 0), 0),
     [banks]
@@ -120,9 +120,9 @@ export default function Dashboard() {
       .reduce((s, t) => s + (Number(t.amount) || 0), 0);
   }, [transactions]);
 
-  // =========================
-  // ✅ INSIGHTS
-  // =========================
+  
+  // INSIGHTS
+  
   const subscriptionInsight = useMemo(() => {
     const subsTotal = transactions
       .filter((t) => t.category === "Subscription" && t.type === "expense")
@@ -143,9 +143,9 @@ export default function Dashboard() {
       ? "Your expenses exceeded your income this month."
       : "Your income is higher than your expenses this month.";
 
-  // =========================
-  // ✅ FILTERED TRANSACTIONS
-  // =========================
+
+  // FILTERED TRANSACTIONS
+ 
   const filteredTxns = useMemo(() => {
     return transactions.filter((t) => {
       const bankOk = bankFilter === "All" || t.bank === bankFilter;
@@ -154,9 +154,9 @@ export default function Dashboard() {
     });
   }, [transactions, bankFilter, categoryFilter]);
 
-  // =========================
-  // ✅ CHART DATA
-  // =========================
+  
+  // CHART DATA
+
   const categorySpend = useMemo(() => {
     const map = {};
     transactions.forEach((t) => {
@@ -196,7 +196,7 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold text-sky-50">Dashboard</h1>
       <p className="text-sky-200 mt-1">Unified financial overview</p>
 
-      {/* ✅ Connected banks */}
+      {/* Connected banks */}
       <p className="text-sky-200 mt-2 text-sm font-semibold">
         Connected Banks:{" "}
         {connectedBanks.length > 0
@@ -210,7 +210,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ✅ INSIGHTS */}
+      {/* INSIGHTS */}
       <div className="mt-6 space-y-3">
         <div className="bg-sky-300/10 border border-sky-300/20 rounded-2xl p-4">
           <p className="text-sky-50 font-semibold">{subscriptionInsight}</p>
@@ -221,7 +221,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ✅ SUMMARY */}
+      {/* SUMMARY */}
       <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl p-6">
         <p className="text-sky-200">Total Balance</p>
         <h2 className="text-4xl font-extrabold text-sky-50 mt-1">
@@ -244,7 +244,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ✅ PER BANK CARDS */}
+        {/* PER BANK CARDS */}
         <div className="mt-6 grid md:grid-cols-3 gap-4">
           {banks.map((b) => (
             <div
@@ -260,7 +260,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ✅ FILTERS */}
+      {/* FILTERS */}
       <div className="mt-8 flex flex-wrap gap-3">
         <select
           value={bankFilter}
@@ -291,7 +291,7 @@ export default function Dashboard() {
         </select>
       </div>
 
-      {/* ✅ CHARTS */}
+      {/* CHARTS */}
       <div className="mt-8 grid md:grid-cols-2 gap-6">
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
           <h3 className="text-xl font-bold text-sky-50">
@@ -339,7 +339,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ✅ EXPORT */}
+      {/* EXPORT */}
       <div className="mt-8">
         <button
           onClick={exportCSV}
@@ -349,7 +349,7 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* ✅ TRANSACTIONS */}
+      {/* TRANSACTIONS */}
       <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl p-6">
         <h3 className="text-xl font-bold text-sky-50">Transactions</h3>
 

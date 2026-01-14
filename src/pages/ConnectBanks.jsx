@@ -126,7 +126,7 @@ export default function ConnectBanks() {
 
   return (
     <div className="consent-page">
-      <div className="demo-pill">🧪 Demo Mode — No real bank data is used</div>
+      <div className="demo-pill">Demo Mode — No real bank data is used</div>
 
       <h1 className="consent-title">Account Aggregator Consent</h1>
       <p className="consent-subtitle">
