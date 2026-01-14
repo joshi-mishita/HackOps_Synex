@@ -51,8 +51,8 @@ export default function Dashboard() {
     });
   }, [bankFilter, categoryFilter]);
 
-  // ====== INSIGHT ======
-  const insight = useMemo(() => {
+  // ====== INSIGHTS ======
+  const subscriptionInsight = useMemo(() => {
     const subsTotal = transactions
       .filter((t) => t.category === "Subscription" && t.type === "expense")
       .reduce((s, t) => s + t.amount, 0);
@@ -66,6 +66,11 @@ export default function Dashboard() {
     }
     return "Your subscription spending is under control.";
   }, [expenseTotal]);
+
+  const cashflowInsight =
+    expenseTotal > incomeTotal
+      ? "Your expenses exceeded your income this month."
+      : "Your income is higher than your expenses this month.";
 
   // ====== CHART DATA ======
   const categorySpend = useMemo(() => {
@@ -96,9 +101,15 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold text-sky-50">Dashboard</h1>
       <p className="text-sky-200 mt-1">Unified financial overview</p>
 
-      {/* INSIGHT */}
-      <div className="mt-6 bg-sky-300/10 border border-sky-300/20 rounded-2xl p-4">
-        <p className="text-sky-50 font-semibold">{insight}</p>
+      {/* INSIGHTS */}
+      <div className="mt-6 space-y-3">
+        <div className="bg-sky-300/10 border border-sky-300/20 rounded-2xl p-4">
+          <p className="text-sky-50 font-semibold">{subscriptionInsight}</p>
+        </div>
+
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+          <p className="text-sky-50 font-semibold">{cashflowInsight}</p>
+        </div>
       </div>
 
       {/* SUMMARY */}
@@ -108,7 +119,6 @@ export default function Dashboard() {
           ₹{totalBalance.toLocaleString("en-IN")}
         </h2>
 
-        {/* INCOME VS EXPENSE */}
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="bg-green-500/10 rounded-xl p-3">
             <p className="text-green-300 text-sm">Monthly Income</p>
@@ -125,7 +135,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* BANK CARDS */}
         <div className="mt-6 grid md:grid-cols-3 gap-4">
           {banks.map((b) => (
             <div
@@ -141,80 +150,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* CHARTS */}
-      <div className="mt-8 grid md:grid-cols-2 gap-6">
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-          <h3 className="text-xl font-bold text-sky-50">
-            Category-wise Spending
-          </h3>
-          <div className="mt-6 h-[250px]">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={categorySpend} dataKey="value" nameKey="name">
-                  {categorySpend.map((_, i) => (
-                    <Cell
-                      key={i}
-                      fill={
-                        ["#7DD3FC", "#38BDF8", "#A78BFA", "#34D399"][i % 4]
-                      }
-                    />
-                  ))}
-                </Pie>
-                <Tooltip {...tooltipStyle} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-          <h3 className="text-xl font-bold text-sky-50">Bank-wise Balance</h3>
-          <div className="mt-6 h-[250px]">
-            <ResponsiveContainer>
-              <BarChart data={bankBalances}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" stroke="#BAE6FD" />
-                <YAxis stroke="#BAE6FD" />
-                <Tooltip {...tooltipStyle} />
-                <Bar dataKey="value" fill="#7DD3FC" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* FILTERS */}
-      <div className="mt-8">
-        <p className="text-sky-200 font-semibold mb-2">Filter Transactions</p>
-        <div className="flex gap-4">
-          <select
-            value={bankFilter}
-            onChange={(e) => setBankFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sky-50"
-          >
-            <option>All</option>
-            {banks.map((b) => (
-              <option key={b.id}>{b.name}</option>
-            ))}
-          </select>
-
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sky-50"
-          >
-            <option>All</option>
-            {categories.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       {/* TRANSACTIONS */}
       <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl p-6">
         <h3 className="text-xl font-bold text-sky-50">Transactions</h3>
 
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-3 max-h-[350px] overflow-y-auto">
           {filteredTxns.map((t) => (
             <button
               key={t.id}
