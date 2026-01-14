@@ -1,143 +1,111 @@
-/* Premium fintech AA consent screen */
-
 .consent-page {
   min-height: 100vh;
-  background: radial-gradient(circle at top, rgba(125, 211, 252, 0.08), transparent 40%),
-    var(--bg);
-  padding: 48px 16px;
+  padding: 50px 28px 80px;
+  background: var(--bg);
+  color: var(--text-main);
 }
 
-.consent-container {
-  max-width: 950px;
-  margin: 0 auto;
-}
-
-/* Top Demo banner */
-.demo-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.demo-pill {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 26px;
   padding: 14px 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
-}
-
-.demo-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: #7dd3fc;
-  box-shadow: 0 0 18px rgba(125, 211, 252, 0.65);
-}
-
-.demo-title {
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-.demo-sub {
+  border-radius: 14px;
+  background: rgba(125, 211, 252, 0.12);
+  border: 1px solid rgba(125, 211, 252, 0.18);
   color: var(--text-secondary);
-  font-weight: 600;
-  opacity: 0.9;
+  font-weight: 700;
 }
 
-.page-title {
-  margin-top: 22px;
-  font-size: 30px;
-  font-weight: 900;
-  color: var(--text-main);
+.consent-title {
+  max-width: 1100px;
+  margin: 0 auto;
+  font-size: 44px;
+  letter-spacing: -0.02em;
 }
 
-.page-subtitle {
-  margin-top: 6px;
+.consent-subtitle {
+  max-width: 1100px;
+  margin: 10px auto 26px;
   color: var(--text-secondary);
+  font-size: 18px;
   font-weight: 600;
 }
 
-/* Bank cards */
-.bank-list {
-  margin-top: 22px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+.bank-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
 }
 
 .bank-card {
-  width: 240px;
-  padding: 18px 18px;
-  border-radius: 18px;
   text-align: left;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 22px 22px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  transition: all 0.25s ease;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .bank-card:hover {
+  background: rgba(255, 255, 255, 0.07);
   transform: translateY(-2px);
-  border-color: rgba(125, 211, 252, 0.35);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 
 .bank-card.active {
-  border: 1px solid rgba(125, 211, 252, 0.55);
-  background: rgba(125, 211, 252, 0.10);
-  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.12);
+  border: 2px solid rgba(125, 211, 252, 0.45);
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.10);
 }
 
 .bank-name {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 900;
-  color: var(--text-main);
 }
 
-.bank-tag {
-  margin-top: 6px;
-  font-size: 12px;
+.bank-sub {
+  margin-top: 8px;
+  color: var(--text-muted);
   font-weight: 700;
-  color: var(--text-secondary);
-  opacity: 0.85;
 }
 
-/* Consent info */
 .consent-info {
-  margin-top: 18px;
-  padding: 20px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
+  max-width: 1100px;
+  margin: 18px auto 0;
+  border-radius: 24px;
+  padding: 22px 24px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .consent-text {
-  font-weight: 800;
-  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 900;
 }
 
-.consent-badges {
-  margin-top: 8px;
+.consent-meta {
+  margin-top: 10px;
   color: var(--text-secondary);
   font-weight: 700;
 }
 
-/* Buttons */
 .primary-btn {
-  margin-top: 16px;
-  width: fit-content;
-  padding: 12px 18px;
-  border-radius: 14px;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: rgba(125, 211, 252, 0.95);
+  color: #08202f;
   font-weight: 900;
-  background: #7dd3fc;
-  color: #071626;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 0.2s ease;
 }
 
 .primary-btn:hover {
-  background: #bae6fd;
+  background: rgba(186, 230, 253, 0.95);
   transform: translateY(-1px);
 }
 
@@ -147,181 +115,118 @@
   transform: none;
 }
 
-.secondary-btn {
+.spinner {
   margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  font-weight: 900;
-  color: var(--text-main);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  cursor: pointer;
-  transition: all 0.2s ease;
+  font-weight: 800;
+  color: var(--text-secondary);
 }
 
-.secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.10);
-}
-
-/* Loader */
-.status-box {
-  margin-top: 20px;
-  padding: 18px;
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.05);
+.otp-card {
+  max-width: 1100px;
+  margin: 18px auto 0;
+  border-radius: 28px;
+  padding: 26px 26px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-.status-text {
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-.loader {
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.20);
-  border-top-color: #7dd3fc;
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* OTP card */
-.otp-card {
-  margin-top: 22px;
-  padding: 22px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.otp-title {
-  font-size: 18px;
+.otp-card h2 {
+  margin: 0;
+  font-size: 26px;
   font-weight: 950;
-  color: var(--text-main);
 }
 
-.otp-sub {
-  margin-top: 6px;
-  color: var(--text-secondary);
+.otp-card p {
+  margin-top: 10px;
   font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.otp-inputs {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
 }
 
 .otp-box {
-  margin-top: 16px;
-  display: flex;
-  gap: 10px;
-}
-
-.otp-input {
-  width: 46px;
-  height: 56px;
-  border-radius: 14px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 950;
-  color: var(--text-main);
-  background: rgba(0, 0, 0, 0.20);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  width: 58px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   outline: none;
+  text-align: center;
+  color: var(--text-main);
+  font-size: 22px;
+  font-weight: 900;
 }
 
-.otp-input:focus {
-  border-color: rgba(125, 211, 252, 0.65);
-  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.20);
+.otp-box:focus {
+  border: 2px solid rgba(125, 211, 252, 0.55);
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.12);
 }
 
-.otp-footer {
-  margin-top: 12px;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  color: var(--text-secondary);
-  font-weight: 700;
-}
-
-/* Success card */
-.success-card {
-  margin-top: 24px;
-  padding: 22px;
-  border-radius: 26px;
-  border: 1px solid rgba(34, 197, 94, 0.25);
-  background: rgba(34, 197, 94, 0.08);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-}
-
-.success-head {
+.otp-actions {
+  margin-top: 18px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
 }
 
-.success-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  background: rgba(34, 197, 94, 0.16);
-  border: 1px solid rgba(34, 197, 94, 0.22);
-  font-size: 18px;
+.otp-resend {
+  color: var(--text-secondary);
+  font-weight: 800;
 }
 
-.success-card h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 950;
-  color: #dcfce7;
+.otp-demo {
+  color: var(--text-muted);
+  font-weight: 900;
 }
 
-.success-card p {
-  margin: 0;
-  color: rgba(220, 252, 231, 0.88);
-  font-weight: 700;
+.success-card {
+  max-width: 1100px;
+  margin: 18px auto 0;
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: rgba(34, 197, 94, 0.10);
+  border: 1px solid rgba(34, 197, 94, 0.18);
+  color: #d1fae5;
+  font-weight: 900;
 }
 
 .success-grid {
-  margin-top: 14px;
+  margin-top: 12px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.success-item {
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.20);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.success-item .k {
-  font-size: 12px;
-  font-weight: 800;
-  color: rgba(220, 252, 231, 0.85);
-}
-
-.success-item .v {
-  margin-top: 4px;
-  font-weight: 950;
-  color: #ffffff;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 }
 
 .error-box {
-  margin-top: 20px;
+  margin-top: 16px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: rgba(239, 68, 68, 0.10);
+  background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.22);
   color: #fecaca;
   font-weight: 900;
+}
+
+.error-inline {
+  margin-top: 14px;
+  color: #fecaca;
+  font-weight: 900;
+}
+
+@media (max-width: 920px) {
+  .bank-grid {
+    grid-template-columns: 1fr;
+  }
+  .otp-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .success-grid {
+    grid-template-columns: 1fr;
+  }
 }

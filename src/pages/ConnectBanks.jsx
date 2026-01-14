@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ConnectBanks.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+
 export default function ConnectBanks() {
   const navigate = useNavigate();
   const otpRefs = useRef([]);
   const startTimeRef = useRef(null);
 
-  /* BANK DATA */
   const banks = [
     { id: "hdfc", name: "HDFC Bank" },
     { id: "icici", name: "ICICI Bank" },
@@ -20,48 +21,15 @@ export default function ConnectBanks() {
     sbi: "SBI requires additional verification.",
   };
 
-  /* STATE */
-  const [selectedBank, setSelectedBank] = useState(null);
+  const [selectedBank, setSelectedBank] = useState("hdfc");
   const [status, setStatus] = useState("idle");
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
   const [attempts, setAttempts] = useState(0);
   const [latency, setLatency] = useState(null);
   const [consentId, setConsentId] = useState(null);
-  const [expirySeconds, setExpirySeconds] = useState(30 * 24 * 60 * 60);
+  const [error, setError] = useState("");
 
-  /* UTILITIES */
-  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-  function generateConsentId() {
-    return (
-      "AA-" +
-      selectedBank?.toUpperCase() +
-      "-" +
-      Math.random().toString(36).substring(2, 8).toUpperCase()
-    );
-  }
-
-  function downloadReceipt() {
-    const data = {
-      consentId,
-      bank: selectedBank,
-      issuedAt: new Date().toISOString(),
-      expiresInSeconds: expirySeconds,
-      latency,
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "consent-receipt.json";
-    a.click();
-  }
-
-  /* TIMERS */
   useEffect(() => {
     if (status === "otp" && timer > 0) {
       const i = setInterval(() => setTimer((t) => t - 1), 1000);
@@ -69,25 +37,40 @@ export default function ConnectBanks() {
     }
   }, [status, timer]);
 
-  useEffect(() => {
-    if (status === "success" && expirySeconds > 0) {
-      const i = setInterval(() => setExpirySeconds((e) => e - 1), 1000);
-      return () => clearInterval(i);
-    }
-  }, [status, expirySeconds]);
+  function handleOtpChange(val, i) {
+    if (!/^[0-9]?$/.test(val)) return;
+    const arr = otp.split("");
+    arr[i] = val;
+    setOtp(arr.join(""));
+    if (val && i < 5) otpRefs.current[i + 1]?.focus();
+  }
 
-  /* FLOW HANDLERS */
   async function handleConsent() {
-    setStatus("redirect");
-    startTimeRef.current = performance.now();
-    await delay(1400);
+    try {
+      setError("");
+      setStatus("redirect");
+      startTimeRef.current = performance.now();
 
-    setConsentId(generateConsentId());
-    setStatus("otp");
-    setOtp("");
-    setTimer(30);
-    setAttempts(0);
-    setTimeout(() => otpRefs.current[0]?.focus(), 120);
+      const res = await fetch(`${API_URL}/api/consent/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bank: selectedBank }),
+      });
+
+      if (!res.ok) throw new Error("Consent start failed");
+      const data = await res.json();
+
+      setConsentId(data.consentId);
+      setStatus("otp");
+      setOtp("");
+      setTimer(30);
+      setAttempts(0);
+
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    } catch {
+      setStatus("error");
+      setError("❌ Failed to fetch. Backend not reachable or CORS issue.");
+    }
   }
 
   async function handleVerifyOTP() {
@@ -96,172 +79,153 @@ export default function ConnectBanks() {
       return;
     }
 
-    setStatus("verifying");
-    await delay(1100);
+    try {
+      setError("");
+      setStatus("verifying");
 
-    if (otp === "123456") {
+      const res = await fetch(`${API_URL}/api/consent/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bank: selectedBank,
+          otp,
+          consentId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAttempts((a) => a + 1);
+        setStatus("otp");
+        setError(data?.message || "Invalid OTP");
+        return;
+      }
+
       const end = performance.now();
       setLatency(((end - startTimeRef.current) / 1000).toFixed(2));
       setStatus("success");
-      setTimeout(() => navigate("/dashboard"), 3000);
-    } else {
-      setAttempts((a) => a + 1);
-      setStatus("otp");
+
+      // ✅ Store connected banks (MULTIPLE banks can be connected)
+      const existing = JSON.parse(
+        localStorage.getItem("synex_connected_banks") || "[]"
+      );
+
+      if (!existing.includes(selectedBank)) {
+        existing.push(selectedBank);
+      }
+
+      localStorage.setItem("synex_connected_banks", JSON.stringify(existing));
+
+      setTimeout(() => navigate("/dashboard"), 1200);
+    } catch {
+      setStatus("error");
+      setError("❌ Verification failed. Check backend.");
     }
   }
 
-  function handleOtpChange(val, i) {
-    if (!/^[0-9]?$/.test(val)) return;
-    const arr = otp.split("");
-    arr[i] = val;
-    const nextOtp = arr.join("");
-    setOtp(nextOtp);
-
-    if (val && i < 5) otpRefs.current[i + 1]?.focus();
-    if (!val && i > 0) otpRefs.current[i - 1]?.focus();
-  }
-
-  const otpFilled = otp.length === 6 && !otp.includes(undefined);
-
   return (
     <div className="consent-page">
-      <div className="consent-container">
-        {/* Banner */}
-        <div className="demo-banner">
-          <span className="demo-dot" />
-          <span className="demo-title">Demo Mode</span>
-          <span className="demo-sub">Simulated AA consent flow</span>
+      <div className="demo-pill">🧪 Demo Mode — No real bank data is used</div>
+
+      <h1 className="consent-title">Account Aggregator Consent</h1>
+      <p className="consent-subtitle">
+        Select a bank and grant consent to fetch balances & recent transactions.
+      </p>
+
+      <div className="bank-grid">
+        {banks.map((b) => (
+          <button
+            type="button"
+            key={b.id}
+            onClick={() => {
+              setSelectedBank(b.id);
+              setStatus("idle");
+              setError("");
+            }}
+            className={`bank-card ${selectedBank === b.id ? "active" : ""}`}
+          >
+            <div className="bank-name">{b.name}</div>
+            <div className="bank-sub">Secure Gateway</div>
+          </button>
+        ))}
+      </div>
+
+      <div className="consent-info">
+        <div className="consent-text">{bankConsentText[selectedBank]}</div>
+        <div className="consent-meta">
+          🔒 Low Risk · Read-only Access · 256-bit Encrypted
         </div>
 
-        <h1 className="page-title">Account Aggregator Consent</h1>
-        <p className="page-subtitle">
-          Select a bank and grant consent to fetch balances & recent transactions.
-        </p>
-
-        {/* Bank list */}
-        <div className="bank-list">
-          {banks.map((b) => (
-            <button
-              key={b.id}
-              onClick={() => setSelectedBank(b.id)}
-              className={`bank-card ${selectedBank === b.id ? "active" : ""}`}
-            >
-              <p className="bank-name">{b.name}</p>
-              <p className="bank-tag">Secure Gateway</p>
-            </button>
-          ))}
-        </div>
-
-        {/* Consent Info */}
-        {selectedBank && (
-          <div className="consent-info">
-            <p className="consent-text">{bankConsentText[selectedBank]}</p>
-            <p className="consent-badges">
-              🔒 Low Risk · Read-only Access · 256-bit Encrypted
-            </p>
-
-            {status === "idle" && (
-              <button className="primary-btn" onClick={handleConsent}>
-                Grant Consent
-              </button>
-            )}
-          </div>
+        {status === "idle" && (
+          <button className="primary-btn" onClick={handleConsent}>
+            Grant Consent
+          </button>
         )}
 
         {status === "redirect" && (
-          <div className="status-box">
-            <div className="loader" />
-            <p className="status-text">
-              Redirecting to {selectedBank?.toUpperCase()} secure gateway…
-            </p>
-          </div>
+          <div className="spinner">Redirecting to secure bank gateway…</div>
         )}
 
-        {/* OTP */}
-        {status === "otp" && (
-          <div className="otp-card">
-            <h3 className="otp-title">Verify OTP</h3>
-            <p className="otp-sub">
-              Enter the 6-digit OTP sent to your registered mobile.
-            </p>
+        {status === "error" && <div className="error-box">{error}</div>}
+      </div>
 
-            <div className="otp-box">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <input
-                  key={i}
-                  ref={(el) => (otpRefs.current[i] = el)}
-                  maxLength="1"
-                  value={otp[i] || ""}
-                  onChange={(e) => handleOtpChange(e.target.value, i)}
-                  className="otp-input"
-                />
-              ))}
-            </div>
+      {(status === "otp" || status === "verifying") && (
+        <div className="otp-card">
+          <h2>Verify OTP</h2>
+          <p>Enter the 6-digit OTP sent to your registered mobile.</p>
 
+          <div className="otp-inputs">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <input
+                key={i}
+                ref={(el) => (otpRefs.current[i] = el)}
+                className="otp-box"
+                maxLength="1"
+                value={otp[i] || ""}
+                onChange={(e) => handleOtpChange(e.target.value, i)}
+              />
+            ))}
+          </div>
+
+          <div className="otp-actions">
             <button
               className="primary-btn"
               onClick={handleVerifyOTP}
-              disabled={!otpFilled}
+              disabled={status === "verifying" || otp.length !== 6}
             >
-              Verify OTP
+              {status === "verifying" ? "Verifying..." : "Verify OTP"}
             </button>
 
-            <div className="otp-footer">
-              <p>{timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}</p>
-              <p>
-                Demo OTP: <b>123456</b>
-              </p>
+            <div className="otp-resend">
+              {timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}
+            </div>
+            <div className="otp-demo">
+              Demo OTP: <b>123456</b>
             </div>
           </div>
-        )}
 
-        {status === "verifying" && (
-          <div className="status-box">
-            <div className="loader" />
-            <p className="status-text">Verifying OTP…</p>
-          </div>
-        )}
+          {error ? <div className="error-inline">{error}</div> : null}
+        </div>
+      )}
 
-        {status === "locked" && (
-          <div className="error-box">
-            Too many failed attempts. Please retry later.
-          </div>
-        )}
+      {status === "locked" && (
+        <div className="error-box">Too many attempts. Try again later.</div>
+      )}
 
-        {/* SUCCESS */}
-        {status === "success" && (
-          <div className="success-card">
-            <div className="success-head">
-              <div className="success-icon">✅</div>
-              <div>
-                <h2>Consent Granted</h2>
-                <p>Redirecting you to dashboard…</p>
-              </div>
+      {status === "success" && (
+        <div className="success-card">
+          <h2>✅ Consent Granted</h2>
+          <div className="success-grid">
+            <div>
+              <b>Consent ID:</b> {consentId}
             </div>
-
-            <div className="success-grid">
-              <div className="success-item">
-                <p className="k">Consent ID</p>
-                <p className="v">{consentId}</p>
-              </div>
-
-              <div className="success-item">
-                <p className="k">Latency</p>
-                <p className="v">{latency}s</p>
-              </div>
-
-              <div className="success-item">
-                <p className="k">Expires In</p>
-                <p className="v">{Math.floor(expirySeconds / 3600)} hours</p>
-              </div>
+            <div>
+              <b>Latency:</b> {latency}s
             </div>
-
-            <button className="secondary-btn" onClick={downloadReceipt}>
-              Download Consent Receipt
-            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
