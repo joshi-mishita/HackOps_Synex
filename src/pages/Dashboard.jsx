@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { banks, transactions, categories } from "../data/mockData";
-import { downloadCSV } from "../utils/csv";
 import TransactionDrawer from "../components/TransactionDrawer";
 import {
   ResponsiveContainer,
@@ -21,11 +20,29 @@ export default function Dashboard() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
 
+  // ====== TOTALS ======
   const totalBalance = useMemo(
     () => banks.reduce((sum, b) => sum + b.balance, 0),
     []
   );
 
+  const incomeTotal = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.type === "income")
+        .reduce((s, t) => s + t.amount, 0),
+    []
+  );
+
+  const expenseTotal = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.type === "expense")
+        .reduce((s, t) => s + t.amount, 0),
+    []
+  );
+
+  // ====== FILTERED TRANSACTIONS ======
   const filteredTxns = useMemo(() => {
     return transactions.filter((t) => {
       const bankOk = bankFilter === "All" || t.bank === bankFilter;
@@ -34,17 +51,23 @@ export default function Dashboard() {
     });
   }, [bankFilter, categoryFilter]);
 
-  // Insight
+  // ====== INSIGHT ======
   const insight = useMemo(() => {
-    const subs = transactions.filter(
-      (t) => t.category === "Subscription" && t.type === "expense"
-    );
-    if (subs.length >= 2)
-      return "You have multiple active subscriptions. Consider cancelling unused ones.";
-    return "Your spending looks balanced. Keep tracking regularly.";
-  }, []);
+    const subsTotal = transactions
+      .filter((t) => t.category === "Subscription" && t.type === "expense")
+      .reduce((s, t) => s + t.amount, 0);
 
-  // Charts
+    const percent = expenseTotal
+      ? Math.round((subsTotal / expenseTotal) * 100)
+      : 0;
+
+    if (percent > 25) {
+      return `You spend ${percent}% of your expenses on subscriptions — higher than normal.`;
+    }
+    return "Your subscription spending is under control.";
+  }, [expenseTotal]);
+
+  // ====== CHART DATA ======
   const categorySpend = useMemo(() => {
     const map = {};
     transactions.forEach((t) => {
@@ -73,18 +96,36 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold text-sky-50">Dashboard</h1>
       <p className="text-sky-200 mt-1">Unified financial overview</p>
 
-      {/* Insight */}
+      {/* INSIGHT */}
       <div className="mt-6 bg-sky-300/10 border border-sky-300/20 rounded-2xl p-4">
         <p className="text-sky-50 font-semibold">{insight}</p>
       </div>
 
-      {/* Summary */}
+      {/* SUMMARY */}
       <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl p-6">
         <p className="text-sky-200">Total Balance</p>
         <h2 className="text-4xl font-extrabold text-sky-50 mt-1">
           ₹{totalBalance.toLocaleString("en-IN")}
         </h2>
 
+        {/* INCOME VS EXPENSE */}
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="bg-green-500/10 rounded-xl p-3">
+            <p className="text-green-300 text-sm">Monthly Income</p>
+            <p className="text-2xl font-bold text-green-400">
+              ₹{incomeTotal.toLocaleString("en-IN")}
+            </p>
+          </div>
+
+          <div className="bg-red-500/10 rounded-xl p-3">
+            <p className="text-red-300 text-sm">Monthly Expense</p>
+            <p className="text-2xl font-bold text-red-400">
+              ₹{expenseTotal.toLocaleString("en-IN")}
+            </p>
+          </div>
+        </div>
+
+        {/* BANK CARDS */}
         <div className="mt-6 grid md:grid-cols-3 gap-4">
           {banks.map((b) => (
             <div
@@ -100,7 +141,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Charts */}
+      {/* CHARTS */}
       <div className="mt-8 grid md:grid-cols-2 gap-6">
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
           <h3 className="text-xl font-bold text-sky-50">
@@ -114,9 +155,7 @@ export default function Dashboard() {
                     <Cell
                       key={i}
                       fill={
-                        ["#7DD3FC", "#38BDF8", "#A78BFA", "#34D399"][
-                          i % 4
-                        ]
+                        ["#7DD3FC", "#38BDF8", "#A78BFA", "#34D399"][i % 4]
                       }
                     />
                   ))}
@@ -143,31 +182,35 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="mt-8 flex gap-4">
-        <select
-          value={bankFilter}
-          onChange={(e) => setBankFilter(e.target.value)}
-          className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sky-50"
-        >
-          <option>All</option>
-          {banks.map((b) => (
-            <option key={b.id}>{b.name}</option>
-          ))}
-        </select>
+      {/* FILTERS */}
+      <div className="mt-8">
+        <p className="text-sky-200 font-semibold mb-2">Filter Transactions</p>
+        <div className="flex gap-4">
+          <select
+            value={bankFilter}
+            onChange={(e) => setBankFilter(e.target.value)}
+            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sky-50"
+          >
+            <option>All</option>
+            {banks.map((b) => (
+              <option key={b.id}>{b.name}</option>
+            ))}
+          </select>
 
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sky-50"
-        >
-          {categories.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sky-50"
+          >
+            <option>All</option>
+            {categories.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Transactions */}
+      {/* TRANSACTIONS */}
       <div className="mt-8 bg-white/5 border border-white/10 rounded-3xl p-6">
         <h3 className="text-xl font-bold text-sky-50">Transactions</h3>
 
